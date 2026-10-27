@@ -1,0 +1,133 @@
+---
+title: "Documentation: analysis.R"
+author: "Vikas Palan"
+date: "27 October 2026"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+---
+
+AI Assistance Declaration: OpenAI Codex (model version unavailable), 27 October 2026, assisted with documentation review, revision, formatting, and packaging. The supplied example attributes earlier drafting to Grok (xAI); its version, prompts, and prior verification are unconfirmed. Available prompts and key responses are recorded in AI_Prompts_Appendix.md. No analysis calculations were performed in this revision. Student verification, R execution, R Markdown knitting, and GitHub preview/upload remain pending. This statement does not attest that Vikas Palan performed those actions.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = TRUE)
+```
+
+# Purpose
+
+This document explains the purpose, inputs, processing steps, and outputs of the script `R/analysis.R`.  
+The script performs an exploratory analysis of a synthetic customer purchase dataset to answer basic business questions about spending patterns by region and product category.
+
+# Inputs
+
+- **File**: `data/synthetic_customers.csv`
+- **Description**: 15 rows of synthetic customer purchase data with the following columns:
+  - `customer_id` – unique identifier
+  - `age` – customer age
+  - `gender` – Male / Female
+  - `region` – West / East / Central
+  - `purchase_amount` – purchase value; currency unspecified
+  - `purchase_date` – date of purchase (YYYY-MM-DD)
+  - `category` – Electronics / Clothing / Home
+
+# Script Walkthrough
+
+## 1. Load packages and data
+
+```{r load-data}
+library(tidyverse)
+library(lubridate)
+
+customers <- read_csv("data/synthetic_customers.csv", show_col_types = FALSE)
+```
+
+## 2. Initial data inspection
+
+```{r inspect}
+glimpse(customers)
+summary(customers$purchase_amount)
+```
+
+## 3. Data preparation
+
+We create an age group variable and ensure the date column is properly typed.
+
+```{r clean}
+customers_clean <- customers %>%
+  mutate(
+    purchase_date = ymd(purchase_date),
+    age_group = case_when(
+      age < 30 ~ "18-29",
+      age < 45 ~ "30-44",
+      TRUE     ~ "45+"
+    )
+  )
+```
+
+## 4. Summary statistics
+
+### Average spend by region
+
+```{r region-summary}
+region_summary <- customers_clean %>%
+  group_by(region) %>%
+  summarise(
+    n_customers = n(),
+    avg_spend   = mean(purchase_amount, na.rm = TRUE),
+    total_spend = sum(purchase_amount, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(avg_spend))
+
+region_summary
+```
+
+### Average spend by category
+
+```{r category-summary}
+category_summary <- customers_clean %>%
+  group_by(category) %>%
+  summarise(
+    n_purchases = n(),
+    avg_spend   = mean(purchase_amount, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+category_summary
+```
+
+## 5. Visualization
+
+```{r plot, fig.width=7, fig.height=4.5}
+ggplot(customers_clean, aes(x = region, y = purchase_amount, fill = region)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(
+    title = "Purchase Amount by Region",
+    x = "Region",
+    y = "Purchase Amount ($)"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+# Outputs
+
+- Console tables showing region and category summaries
+- A boxplot comparing purchase amounts across regions
+- No files are saved by default. In the standalone script, optional `ggsave()` requires an existing `output/` directory.
+
+# Notes & Best Practices
+
+- All data is synthetic; no real customer information is used.
+- Code follows tidyverse style for readability.
+- The script is intentionally short so it can be easily documented and reviewed.
+
+# Limitations and reproduction
+
+Region and category are paired in the data: West/Electronics, East/Clothing, and Central/Home. Do not infer separate regional or category effects. The script creates age groups but does not analyze them. `n_customers` counts rows, not distinct identifiers; missing ages fall into the final age-group branch. The dollar label does not establish a currency.
+
+Keep this document in the project root so the relative CSV path resolves. Install `tidyverse`, `lubridate`, `rmarkdown`, and `knitr`, then Knit to HTML in RStudio or run `rmarkdown::render("analysis_documentation.Rmd")` from the root. The chunks reproduce the supplied script's main blocks; the script is not also sourced, avoiding duplicate execution.
+
+This revision was not executed or knitted in R. A separately generated submission-summary PDF is not a knitted analysis report. Record actual R/package versions, warnings, and render results in `Verification.md` after running the project.

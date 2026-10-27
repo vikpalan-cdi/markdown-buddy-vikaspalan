@@ -1,0 +1,16 @@
+customer_id,age,gender,region,purchase_amount,purchase_date,category
+C001,34,Female,West,128.50,2024-01-15,Electronics
+C002,29,Male,East,45.20,2024-01-16,Clothing
+C003,45,Female,Central,210.00,2024-01-17,Home
+C004,22,Male,West,67.80,2024-01-18,Electronics
+C005,38,Female,East,155.40,2024-01-19,Clothing
+C006,51,Male,Central,89.90,2024-01-20,Home
+C007,27,Female,West,34.50,2024-01-21,Electronics
+C008,41,Male,East,198.75,2024-01-22,Clothing
+C009,33,Female,Central,76.30,2024-01-23,Home
+C010,56,Male,West,142.00,2024-01-24,Electronics
+C011,25,Female,East,58.90,2024-01-25,Clothing
+C012,47,Male,Central,167.20,2024-01-26,Home
+C013,31,Female,West,92.40,2024-01-27,Electronics
+C014,39,Male,East,113.60,2024-01-28,Clothing
+C015,44,Female,Central,201.80,2024-01-29,Home
